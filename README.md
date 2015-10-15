@@ -7,6 +7,9 @@ The stream buffer is done to RAM as buffering to disk was rather intensive on ol
 
 Installation: 
  - edit index.php, and modify the camera IP address, port, and url to the mjpeg stream.
+ - Modify any of the image settings - ie overlay image and fallback image locations. Note - if you don't want an overlay image, use a fully transparent png, or edit the code to remove this functionality yourself.
  - modify the mjpeg boundary text - this varies between different model cameras. Studying the raw headers of your mjpeg stream from the camera, or the content of the stream to find frame boundary text.
  
  Enjoy!
+ 
+ Questions? Contact us via http://webmad.co.nz
