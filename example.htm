@@ -1,0 +1,28 @@
+<html>
+<head>
+	<style>
+		.imgholder{ position:relative; }
+		.staticimg{ position:relative;z-index:1; }
+		.dynamicimg{ position:absolute;z-index:2;top:0px;left:0px; }
+	</style>
+</head>
+<body>
+<div class="imgholder">
+	<img src="webcam.jpg" class="staticimg" />
+	<img src="stream.php" class="dynamicimg" />
+</div>
+<!-- Smart(ish) stuff for browsers that don't support mjpeg: -->
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script>
+	function loadimg(){
+		$('.dynamicimg').unbind('load error');
+		$('.dynamicimg').one('load error',function(){ var t = setTimeout("loadimg()",400); });
+		var time = new Date().getTime();
+		$('.dynamicimg').one('load',function(){
+			$('.staticimg').attr('src','webcam.jpg?t='+time);
+		});
+	}
+	$('.dynamicimg').one('error',function(){ if($('.dynamicimg').attr('src')=='stream.php')var t = setTimeout("loadimg()",400); });
+</script>
+</body>
+</html>

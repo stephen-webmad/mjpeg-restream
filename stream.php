@@ -8,6 +8,7 @@ Version: 1.0.0
 Author URI: http://www.webmad.co.nz
 Usage: <img src="stream.php" />
 Notes: If you are keen to have image overlays clickable, use html elements overlaying the <img> element (ie: wrap <img> in a <div> with position:relative; and add an <a> element with display:block;position:absolute;bottom:0px;left:0px;width:100%;height:15px;background:transparent;z-index:2;)
+Requirements: php5+ compiled with --enable-shmop
 
 */
 
