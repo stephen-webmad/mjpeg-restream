@@ -19,7 +19,7 @@ $url = "/videostream.cgi?user=admin&password=pass";
 // Image settings:
 $overlay = "bannerad.png";	//image that will be superimposed onto the stream
 $fallback = "webcam.jpg";	//image that will get updated every 20 frames or so for browsers that don't support mjpeg streams
-$boundary = "IPCamera_Logo";
+$boundary = "IPCamera_Logo";	
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Stuff below here will break things if edited. Avert your eyes unless you know what you are doing
@@ -102,7 +102,7 @@ function fresh(){
 	$frames = array();
 	shmop_write($tmid, str_pad(serialize($data),1024,' '), 0);
 	
-	$fp = @fsockopen($host, $port, $errno, $errstr, 5);
+	$fp = @fsockopen($host, $port, $errno, $errstr, 10);
 	if($fp){
 		$out = "GET $url HTTP/1.1\r\n";
 	    $out .= "Host: $host\r\n";
@@ -111,16 +111,20 @@ function fresh(){
 	    $ec = "";
 	    $in = false;
 	    $buffer='';
-	    while (!feof($fp)) {
+	    while (!feof($fp)) {	    	
 	        $part= fgets($fp);
-	        if(strstr($part,'--'.$boundary))$in=true;
+	        if(strstr($part,'--'.$boundary)){
+	        	$in=true;
+	        }
 	        $buffer .= $part;
 	    	$part=$buffer;
+	    	if(substr(trim($part),0,2)=="--")$part = substr($part,3);
 			$part = substr($part,strpos($part,'--'.$boundary)+strlen('--'.$boundary));
 			$part = trim(substr($part,strpos($part,"\r\n\r\n")));
 			$part = substr($part,0,strpos($part,'--'.$boundary));
+			
 			$img = @imagecreatefromstring($part);
-			if($img){
+			if($img){	
 				$buffer = substr($buffer,strpos($buffer,$part)+strlen($part));				
 				ob_start();
 				output($img,true);	//,null,60
@@ -132,7 +136,8 @@ function fresh(){
 				$frames[] = $imgstr;
 				shmop_write($tdmid, str_pad(serialize($frames),102400,' '), 0);
 				shmop_write($tmid, str_pad(serialize($data),1024,' '), 0);
-				echo "--$boundary\r\nContent-Type: image/jpeg\r\nContent-Length: ".strlen($imgstr)."\r\n\r\n".$frames[$data['frame']];
+								
+				echo "--$boundary\r\nContent-Type: image/jpeg\r\nContent-Length: ".strlen($imgstr)."\r\n\r\n".$imgstr;	//$frames[$data['frame']]
 				if(($data['frame']/20)-(ceil($data['frame']/20))==0)file_put_contents($fallback,$imgstr);
 				if((time()-$start)>45){
 					exit;
